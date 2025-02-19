@@ -1,15 +1,21 @@
-from config import (
-    API_KEY,
-    API_SECRET,
-    mongo_url,
-)
 import logging
-from helper_files.client_helper import strategies
+import math
+import os
+
 from pymongo import MongoClient
 from datetime import datetime
-import math
-from helper_files.client_helper import get_latest_price
 from alpaca.trading.client import TradingClient
+from concurrent.futures import ThreadPoolExecutor
+
+
+from trading import trading_client_main
+from ranking import ranking_client_main
+from helper_files.client_helper import get_latest_price
+from helper_files.client_helper import strategies
+
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 
 # Configure logging
@@ -164,12 +170,12 @@ indicator_periods = {
 
 def insert_rank_to_coefficient(i):
     try:
-        client = MongoClient(mongo_url)
+        client = MongoClient(os.getenv("mongo_url"))
         db = client.trading_simulator
         collections = db.rank_to_coefficient
         """
-      clear all collections entry first and then insert from 1 to i
-      """
+        clear all collections entry first and then insert from 1 to i
+        """
         collections.delete_many({})
         for i in range(1, i + 1):
             e = math.e
@@ -184,7 +190,12 @@ def insert_rank_to_coefficient(i):
 
 def initialize_rank():
     try:
-        client = MongoClient(mongo_url)
+        client = MongoClient(os.getenv("mongo_url"))
+
+        some_db = client["test"]
+        collection = some_db["my_collection"]
+        collection.insert_one({"name": "John Doe"})
+
         db = client.trading_simulator
         collections = db.algorithm_holdings
 
@@ -229,7 +240,7 @@ def initialize_rank():
 
 def initialize_time_delta():
     try:
-        client = MongoClient(mongo_url)
+        client = MongoClient(os.getenv("mongo_url"))
         db = client.trading_simulator
         collection = db.time_delta
         collection.insert_one({"time_delta": 0.01})
@@ -241,7 +252,7 @@ def initialize_time_delta():
 
 def initialize_market_setup():
     try:
-        client = MongoClient(mongo_url)
+        client = MongoClient(os.getenv("mongo_url"))
         db = client.market_data
         collection = db.market_status
         collection.insert_one({"market_status": "closed"})
@@ -253,8 +264,8 @@ def initialize_market_setup():
 
 def initialize_portfolio_percentages():
     try:
-        client = MongoClient(mongo_url)
-        trading_client = TradingClient(API_KEY, API_SECRET)
+        client = MongoClient(os.getenv("mongo_url"))
+        trading_client = TradingClient(os.getenv("API_KEY"), os.getenv("API_SECRET"))
         account = trading_client.get_account()
         db = client.trades
         collection = db.portfolio_values
@@ -285,7 +296,7 @@ def initialize_portfolio_percentages():
 
 def initialize_indicator_setup():
     try:
-        client = MongoClient(mongo_url)
+        client = MongoClient(os.getenv("mongo_url"))
         db = client["IndicatorsDatabase"]
         collection = db["Indicators"]
 
@@ -303,15 +314,17 @@ def initialize_indicator_setup():
 
 def initialize_historical_database_cache():
     try:
-        client = MongoClient(mongo_url)
+        client = MongoClient(os.getenv("mongo_url"))
         db = client["HistoricalDatabase"]
         collection = db["HistoricalDatabase"]
-    except:
-        logging.info("Error initializing historical database cache")
+    except Exception as e:
+        logging.error(f"Error initializing historical database cache: {e}")
         return
 
 
 if __name__ == "__main__":
+    logging.info("Running main.py")
+
     insert_rank_to_coefficient(200)
 
     initialize_rank()
@@ -325,3 +338,17 @@ if __name__ == "__main__":
     initialize_indicator_setup()
 
     initialize_historical_database_cache()
+
+    with ThreadPoolExecutor() as executor:
+        future1 = executor.submit(trading_client_main)
+        future2 = executor.submit(ranking_client_main)
+
+        # Optionally, wait for the functions to complete
+        future1.result()
+        future2.result()
+    # async def run_coroutines():
+    #     await trading_client_main()
+    #     await ranking_client_main()
+
+    # if __name__ == "__main__":
+    #     asyncio.run(run_coroutines())

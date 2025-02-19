@@ -124,13 +124,26 @@ cd AmpyFin
 pip install -r requirements.txt
 ```
 
-- We have recently migrated to using Ta-Lib for trading. Please follow the installation instructions here: 
+- We have recently migrated to using Ta-Lib for trading. Please follow the installation instructions here:
 
 👉 [Ta-Lib Python Original](https://github.com/TA-Lib/ta-lib-python)
 
 👉 [Ta-Lib Python Easy Installation](https://github.com/cgohlke/talib-build/releases)
 
 ### 3️⃣ Configuration
+
+1. **Create `.env`**
+
+```sh
+POLYGON_API_KEY = "your_polygon_api_key"
+FINANCIAL_PREP_API_KEY = "your_fmp_api_key"
+MONGO_DB_USER = "your_mongo_user"
+MONGO_DB_PASS = "your_mongo_password"
+API_KEY = "your_alpaca_api_key"
+API_SECRET = "your_alpaca_secret_key"
+BASE_URL = "https://paper-api.alpaca.markets"
+mongo_url = "your mongo connection string"
+```
 
 1. **Create `config.py`**:
    - Copy `config_template.py` to `config.py` and enter your API keys and MongoDB credentials.
@@ -169,7 +182,11 @@ pip install -r requirements.txt
 
 ## ⚡ Usage
 
-To run the systemt, execute on two separate terminals:
+```bash
+python main.py
+```
+
+To run the system, execute on two separate terminals:
 
 ```bash
 python ranking_client.py

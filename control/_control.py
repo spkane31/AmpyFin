@@ -3,7 +3,7 @@
 # general parameters
 """
 mode is switched between 'train', 'test', 'live'
-'train' means running ranking_client.py and getting updated trading_simulator. 
+'train' means running ranking_client.py and getting updated trading_simulator.
 There will be an option to:
  - update your database if this is the data you want to insert into the database given better results during test
  - save this model to run testing before you decide to update your database
@@ -27,7 +27,7 @@ take_profit = 0.05
 
 # ranking_client.py parameters
 
-rank_mode = 'live'
+rank_mode = "live"
 
 """
 time_delta_mode can be multiplicative, additive, or balanced. Additive results in less overfitting but could result in underfitting as time goes on
@@ -37,7 +37,7 @@ time_delta_increment is used for additive purpose
 time_delta_multiplicative is used for multiplicative purpose
 time_delta_balanced is used for balanced purpose - 0.2 means 0.8 is data influence and 0.2 is current influence
 """
-time_delta_mode = 'additive'
+time_delta_mode = "additive"
 time_delta_increment = 0.01
 time_delta_multiplicative = 1.01
 time_delta_balanced = 0.2
@@ -77,14 +77,14 @@ the price of the asset goes down but by less than 1% in the trade during sell,
 you should penalize the strategy by a multiple of time_delta * 1.  
 loss_price_delta_else is the penalty you should apply if the loss exceeds loss_price_change_ratio_d2.
 """
-loss_price_change_ratio_d1 = 0.975  
-loss_profit_time_d1 = 1   
-loss_price_change_ratio_d2 = 0.95  
-loss_profit_time_d2 = 1.5  
-loss_profit_time_else = 2  
+loss_price_change_ratio_d1 = 0.975
+loss_profit_time_d1 = 1
+loss_price_change_ratio_d2 = 0.95
+loss_profit_time_d2 = 1.5
+loss_profit_time_else = 2
 
 # trading_client.py parameters
-trade_mode = 'live'
+trade_mode = "live"
 
 """
 trade_liquidity_limit is the amount of money you are telling the bot to reserve during ranking. 
